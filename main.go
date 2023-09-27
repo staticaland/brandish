@@ -12,6 +12,10 @@ func main() {
 	if err := build(context.Background()); err != nil {
 		fmt.Println(err)
 	}
+
+	if err := lint(context.Background()); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func build(ctx context.Context) error {
@@ -47,4 +51,28 @@ func build(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func lint(ctx context.Context) error {
+	fmt.Println("Linting with Dagger")
+
+	// initialize Dagger client
+	client, err := dagger.Connect(ctx, dagger.WithLogOutput(os.Stderr))
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	src := client.Host().Directory(".")
+
+	c := client.Container().From("davidanson/markdownlint-cli2")
+
+	c = c.WithDirectory("/src", src).WithWorkdir("/src")
+
+	c = c.WithExec([]string{"README.md"})
+
+	fmt.Println(c.Stdout(ctx))
+
+	return nil
+
 }
