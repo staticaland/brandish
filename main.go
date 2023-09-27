@@ -20,5 +20,11 @@ func main() {
 	defer client.Close()
 
 	fmt.Println(pipelines.Version(client))
-	fmt.Println(pipelines.Markdownlint(client, pipelines.WithGlobs("README.md")))
+	fmt.Println(
+		pipelines.Markdownlint(
+			client,
+			pipelines.WithGlobs("README.md"),
+			pipelines.WithFix(),
+		),
+	)
 }

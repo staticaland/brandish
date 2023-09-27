@@ -2,6 +2,7 @@ package pipelines
 
 import (
 	"context"
+	"fmt"
 
 	"dagger.io/dagger"
 )
@@ -28,7 +29,8 @@ func Version(client *dagger.Client) string {
 func baseMarkdownlint(client *dagger.Client) *dagger.Container {
 	return client.
 		Container().
-		From("davidanson/markdownlint-cli2:latest")
+		From("davidanson/markdownlint-cli2:latest").
+		Pipeline("markdownlint")
 }
 
 type MarkdownlintOption func(*MarkdownlintConfig)
@@ -45,9 +47,9 @@ func WithGlobs(globs string) MarkdownlintOption {
 	}
 }
 
-func WithFix(fix bool) MarkdownlintOption {
+func WithFix() MarkdownlintOption {
 	return func(cfg *MarkdownlintConfig) {
-		cfg.Fix = fix
+		cfg.Fix = true
 	}
 }
 
@@ -80,14 +82,32 @@ func Markdownlint(client *dagger.Client, opts ...MarkdownlintOption) string {
 		args = append(args, "--fix")
 	}
 
-	src := client.Host().Directory(".")
-
-	out, err := baseMarkdownlint(client).
-		WithDirectory("/src", src).WithWorkdir("/src").
+	container, err := baseMarkdownlint(client).
+		WithDirectory("/home/node", client.Host().Directory("."), dagger.ContainerWithDirectoryOpts{
+			Include: []string{
+				cfg.Globs,
+			},
+			Owner: "node",
+		}).WithWorkdir("/home/node").
 		WithExec(args).
-		Stdout(ctx)
+		Sync(ctx)
+
 	if err != nil {
-		panic(err)
+		// Unexpected error, could be network failure.
+		fmt.Println(err)
+	}
+
+	out, err := container.Stdout(ctx)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// If Fix is true, export the changes back to the host
+	if cfg.Fix {
+		_, err := container.Directory(".").Export(ctx, ".")
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	return out
