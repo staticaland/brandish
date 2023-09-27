@@ -1,6 +1,6 @@
 # Brandish
 
-The archmage brandished the ancient dagger, its blade shimmering with arcane runes, as he prepared to cast a spell that would open the gateway between realms 🗡️ 
+The archmage brandished the ancient dagger, its blade shimmering with arcane runes, as he prepared to cast a spell that would open the gateway between realms.
 
 # some-fixable-issues
 
