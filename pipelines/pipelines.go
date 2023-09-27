@@ -6,6 +6,31 @@ import (
 	"dagger.io/dagger"
 )
 
+func base(client *dagger.Client) *dagger.Container {
+	return client.
+		Container().
+		From("alpine:latest")
+}
+
+func Version(client *dagger.Client) string {
+	ctx := context.Background()
+
+	out, err := base(client).
+		WithExec([]string{"cat", "/etc/alpine-release"}).
+		Stdout(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	return out
+}
+
+func baseMarkdownlint(client *dagger.Client) *dagger.Container {
+	return client.
+		Container().
+		From("davidanson/markdownlint-cli2:latest")
+}
+
 type MarkdownlintOption func(*MarkdownlintConfig)
 
 type MarkdownlintConfig struct {
@@ -20,36 +45,16 @@ func WithGlobs(globs string) MarkdownlintOption {
 	}
 }
 
-func WithCommand(config string) MarkdownlintOption {
+func WithFix(fix bool) MarkdownlintOption {
+	return func(cfg *MarkdownlintConfig) {
+		cfg.Fix = fix
+	}
+}
+
+func WithConfig(config string) MarkdownlintOption {
 	return func(cfg *MarkdownlintConfig) {
 		cfg.Config = config
 	}
-}
-
-func base(client *dagger.Client) *dagger.Container {
-	return client.
-		Container().
-		From("alpine:latest")
-}
-
-func baseMarkdownlint(client *dagger.Client) *dagger.Container {
-	return client.
-		Container().
-		From("davidanson/markdownlint-cli2:latest")
-}
-
-// run command in base image
-func Version(client *dagger.Client) string {
-	ctx := context.Background()
-
-	out, err := base(client).
-		WithExec([]string{"cat", "/etc/alpine-release"}).
-		Stdout(ctx)
-	if err != nil {
-		panic(err)
-	}
-
-	return out
 }
 
 func Markdownlint(client *dagger.Client, opts ...MarkdownlintOption) string {
