@@ -26,7 +26,6 @@ func WithCommand(config string) MarkdownlintOption {
 	}
 }
 
-// create base image
 func base(client *dagger.Client) *dagger.Container {
 	return client.
 		Container().
@@ -36,7 +35,7 @@ func base(client *dagger.Client) *dagger.Container {
 func baseMarkdownlint(client *dagger.Client) *dagger.Container {
 	return client.
 		Container().
-		From("davidanson/markdownlint-cli2")
+		From("davidanson/markdownlint-cli2:latest")
 }
 
 // run command in base image
