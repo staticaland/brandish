@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"dagger.io/dagger"
-	"github.com/staticaland/universe/pipelines"
+	"github.com/staticaland/brandish/pipelines"
 )
 
 func main() {

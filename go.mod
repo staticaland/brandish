@@ -1,4 +1,4 @@
-module github.com/staticaland/universe
+module github.com/staticaland/brandish
 
 go 1.21.1
 
