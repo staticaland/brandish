@@ -6,6 +6,28 @@ import (
 	"dagger.io/dagger"
 )
 
+type MarkdownlintOption func(*MarkdownlintConfig)
+
+type MarkdownlintConfig struct {
+	Command   string
+	Config    string
+	Fix       bool
+	Globs     string
+	Separator string
+}
+
+func WithCommand(command string) MarkdownlintOption {
+	return func(cfg *MarkdownlintConfig) {
+		cfg.Command = command
+	}
+}
+
+func WithConfig(config string) MarkdownlintOption {
+	return func(cfg *MarkdownlintConfig) {
+		cfg.Config = config
+	}
+}
+
 // create base image
 func base(client *dagger.Client) *dagger.Container {
 	return client.
@@ -33,11 +55,34 @@ func Version(client *dagger.Client) string {
 	return out
 }
 
-func Markdownlint(client *dagger.Client, path string) string {
+func Markdownlint(client *dagger.Client, opts ...MarkdownlintOption) string {
 	ctx := context.Background()
 
+	// Default configuration
+	cfg := &MarkdownlintConfig{
+		Config: "",
+		Globs:  "*.{md,markdown}",
+		Fix:    false,
+	}
+
+	// Apply options
+	for _, opt := range opts {
+		opt(cfg)
+	}
+
+	args := []string{cfg.Globs}
+	if cfg.Config != "" {
+		args = append(args, "--config", cfg.Config)
+	}
+	if cfg.Fix {
+		args = append(args, "--fix")
+	}
+
+	src := client.Host().Directory(".")
+
 	out, err := baseMarkdownlint(client).
-		WithExec([]string{"markdownlint", path}).
+		WithDirectory("/src", src).WithWorkdir("/src").
+		WithExec(args).
 		Stdout(ctx)
 	if err != nil {
 		panic(err)
