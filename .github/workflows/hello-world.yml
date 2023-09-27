@@ -16,6 +16,10 @@ jobs:
 
       - uses: actions/checkout@v3
 
+      - name: Add problem matcher
+        run: |
+          echo "::add-matcher::.github/workflows/matchers/markdownlint.json"
+
       - uses: actions/setup-go@v3
         with:
           go-version-file: "go.mod"
