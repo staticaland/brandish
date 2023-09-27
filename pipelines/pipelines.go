@@ -9,20 +9,18 @@ import (
 type MarkdownlintOption func(*MarkdownlintConfig)
 
 type MarkdownlintConfig struct {
-	Command   string
-	Config    string
-	Fix       bool
-	Globs     string
-	Separator string
+	Config string
+	Globs  string
+	Fix    bool
 }
 
-func WithCommand(command string) MarkdownlintOption {
+func WithGlobs(globs string) MarkdownlintOption {
 	return func(cfg *MarkdownlintConfig) {
-		cfg.Command = command
+		cfg.Globs = globs
 	}
 }
 
-func WithConfig(config string) MarkdownlintOption {
+func WithCommand(config string) MarkdownlintOption {
 	return func(cfg *MarkdownlintConfig) {
 		cfg.Config = config
 	}
