@@ -3,6 +3,7 @@ package pipelines
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"dagger.io/dagger"
 )
@@ -74,13 +75,24 @@ func Markdownlint(client *dagger.Client, opts ...MarkdownlintOption) string {
 		opt(cfg)
 	}
 
-	args := []string{cfg.Globs}
+	// We will not be using the default ENTRYPOINT and CMD of the image
+	markdownlintCommand := []string{
+		"/usr/local/bin/markdownlint-cli2",
+		cfg.Globs,
+	}
 	if cfg.Config != "" {
-		args = append(args, "--config", cfg.Config)
+		markdownlintCommand = append(markdownlintCommand, "--config", cfg.Config)
 	}
 	if cfg.Fix {
-		args = append(args, "--fix")
+		markdownlintCommand = append(markdownlintCommand, "--fix")
 	}
+
+	// Always return true so that the container exits with 0
+	markdownlintCommand = append(markdownlintCommand, ";", "true")
+
+	markdownlintCommandStr := strings.Join(markdownlintCommand, " ")
+
+	args := []string{"-c", markdownlintCommandStr}
 
 	container, err := baseMarkdownlint(client).
 		WithDirectory("/home/node", client.Host().Directory("."), dagger.ContainerWithDirectoryOpts{
@@ -88,7 +100,9 @@ func Markdownlint(client *dagger.Client, opts ...MarkdownlintOption) string {
 				cfg.Globs,
 			},
 			Owner: "node",
-		}).WithWorkdir("/home/node").
+		}).
+		WithWorkdir("/home/node").
+		WithEntrypoint([]string{"sh"}).
 		WithExec(args).
 		Sync(ctx)
 
