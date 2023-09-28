@@ -2,8 +2,9 @@ module github.com/staticaland/brandish
 
 go 1.21.1
 
+require dagger.io/dagger v0.8.7
+
 require (
-	dagger.io/dagger v0.8.7 // indirect
 	github.com/99designs/gqlgen v0.17.31 // indirect
 	github.com/Khan/genqlient v0.6.0 // indirect
 	github.com/adrg/xdg v0.4.0 // indirect
