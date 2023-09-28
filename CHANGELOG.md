@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/staticaland/brandish/compare/v1.0.0...v1.1.0) (2023-09-28)
+
+
+### Features
+
+* Add Terraform pipeline and refactor a bit ([ec12b94](https://github.com/staticaland/brandish/commit/ec12b94b0283d695e3af2efd1a9e3469812f4ec1))
+
 ## 1.0.0 (2023-09-27)
 
 
