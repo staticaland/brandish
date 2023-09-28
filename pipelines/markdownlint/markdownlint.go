@@ -1,4 +1,4 @@
-package pipelines
+package markdownlint
 
 import (
 	"context"
@@ -60,7 +60,7 @@ func WithConfig(config string) MarkdownlintOption {
 	}
 }
 
-func Markdownlint(client *dagger.Client, opts ...MarkdownlintOption) string {
+func Lint(client *dagger.Client, opts ...MarkdownlintOption) string {
 	ctx := context.Background()
 
 	// Default configuration

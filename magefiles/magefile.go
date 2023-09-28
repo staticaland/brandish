@@ -9,7 +9,7 @@ import (
 
 	"dagger.io/dagger"
 	"github.com/magefile/mage/sh"
-	"github.com/staticaland/brandish/pipelines"
+	"github.com/staticaland/brandish/pipelines/markdownlint"
 )
 
 // Build the project.
@@ -31,7 +31,7 @@ func Lint(ctx context.Context) error {
 	}
 	defer client.Close()
 
-	fmt.Println(pipelines.Markdownlint(client))
+	fmt.Println(markdownlint.Lint(client))
 
 	return nil
 }
@@ -46,10 +46,10 @@ func LintFix(ctx context.Context) error {
 	defer client.Close()
 
 	fmt.Println(
-		pipelines.Markdownlint(
+		markdownlint.Lint(
 			client,
-			pipelines.WithGlobs("README.md"),
-			pipelines.WithFix(),
+			markdownlint.WithGlobs("README.md"),
+			markdownlint.WithFix(),
 		),
 	)
 

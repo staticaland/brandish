@@ -6,7 +6,8 @@ import (
 	"os"
 
 	"dagger.io/dagger"
-	"github.com/staticaland/brandish/pipelines"
+	"github.com/staticaland/brandish/pipelines/markdownlint"
+	"github.com/staticaland/brandish/pipelines/terraform"
 )
 
 func main() {
@@ -19,12 +20,12 @@ func main() {
 	}
 	defer client.Close()
 
-	fmt.Println(pipelines.Markdownlint(client))
 	fmt.Println(
-		pipelines.Markdownlint(
+		markdownlint.Lint(
 			client,
-			pipelines.WithGlobs("README.md"),
-			pipelines.WithFix(),
+			markdownlint.WithGlobs("README.md"),
+			markdownlint.WithFix(),
 		),
 	)
+	fmt.Println(terraform.Fmt(client))
 }
