@@ -10,7 +10,7 @@ require (
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/magefile/mage v1.15.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	github.com/staticaland/brandish v0.0.0-20230927223346-b29a1f8f6771 // indirect
+	github.com/staticaland/brandish v1.1.0 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.6 // indirect
 	golang.org/x/sync v0.3.0 // indirect
 	golang.org/x/sys v0.12.0 // indirect
