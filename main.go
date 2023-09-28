@@ -5,27 +5,27 @@ import (
 	"fmt"
 	"os"
 
-	"dagger.io/dagger"
-	"github.com/staticaland/brandish/pipelines/markdownlint"
-	"github.com/staticaland/brandish/pipelines/terraform"
+	d "dagger.io/dagger"
+	md "github.com/staticaland/brandish/pipelines/markdownlint"
+	tf "github.com/staticaland/brandish/pipelines/terraform"
 )
 
 func main() {
 	ctx := context.Background()
 
 	// initialize Dagger client
-	client, err := dagger.Connect(ctx, dagger.WithLogOutput(os.Stderr))
+	client, err := d.Connect(ctx, d.WithLogOutput(os.Stderr))
 	if err != nil {
 		panic(err)
 	}
 	defer client.Close()
 
 	fmt.Println(
-		markdownlint.Lint(
+		md.Lint(
 			client,
-			markdownlint.WithGlobs("README.md"),
-			markdownlint.WithFix(),
+			md.WithGlobs("README.md"),
+			md.WithFix(),
 		),
 	)
-	fmt.Println(terraform.Fmt(client))
+	fmt.Println(tf.Fmt(client))
 }
