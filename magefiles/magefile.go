@@ -14,12 +14,17 @@ import (
 
 // Build the project.
 func Build() error {
-	return sh.Run("go", "build", "-o", "main", "main.go")
+	return sh.RunV("go", "build", "-o", "main", "main.go")
 }
 
 // Run the project.
 func Run() error {
-	return sh.Run("go", "run", "main.go")
+	return sh.RunV("go", "run", "main.go")
+}
+
+// Test runs the unit tests.
+func Test() error {
+	return sh.RunV("go", "test", "./...")
 }
 
 // Lint
