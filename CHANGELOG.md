@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/staticaland/brandish/compare/v1.2.0...v1.3.0) (2023-09-30)
+
+
+### Features
+
+* Add Terraform plan to pipeline ([c2b4048](https://github.com/staticaland/brandish/commit/c2b4048271c852b548576377594c5c4c1ec9d789))
+
 ## [1.2.0](https://github.com/staticaland/brandish/compare/v1.1.0...v1.2.0) (2023-09-30)
 
 
