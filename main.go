@@ -29,6 +29,7 @@ func main() {
 		),
 	)
 	fmt.Println(tf.Fmt(client))
+	fmt.Println(tf.Plan(client))
 
 	fmt.Println(vale.Vale(
 		client,

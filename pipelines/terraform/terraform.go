@@ -3,6 +3,7 @@ package terraform
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"dagger.io/dagger"
 )
@@ -60,6 +61,7 @@ func Fmt(client *dagger.Client, opts ...TerraformOptions) string {
 	}
 
 	container, err := baseTerraform(client).
+		Pipeline("fmt").
 		WithDirectory("/workdir", client.Host().Directory("."), dagger.ContainerWithDirectoryOpts{
 			Include: []string{
 				"**/*.tf",
@@ -81,6 +83,45 @@ func Fmt(client *dagger.Client, opts ...TerraformOptions) string {
 
 	// Export the changes back to the host
 	_, err = container.Directory(".").Export(ctx, ".")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return out
+}
+
+func Plan(client *dagger.Client) string {
+	ctx := context.Background()
+
+	args := []string{
+		"plan",
+	}
+
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+
+	container, err := baseTerraform(client).
+		Pipeline("plan").
+		WithEnvVariable("AWS_PROFILE", os.Getenv("AWS_PROFILE")).
+		WithDirectory("/root/.aws", client.Host().Directory(fmt.Sprintf("%s/.aws", homeDir))).
+		WithDirectory("/workdir", client.Host().Directory("."), dagger.ContainerWithDirectoryOpts{
+			Include: []string{
+				"**/*.tf",
+			},
+		}).
+		WithWorkdir("/workdir").
+		WithExec(args).
+		Sync(ctx)
+
+	if err != nil {
+		// Unexpected error, could be network failure.
+		fmt.Println(err)
+	}
+
+	out, err := container.Stdout(ctx)
 	if err != nil {
 		fmt.Println(err)
 	}
