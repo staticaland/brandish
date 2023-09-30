@@ -8,6 +8,7 @@ import (
 	d "dagger.io/dagger"
 	md "github.com/staticaland/brandish/pipelines/markdownlint"
 	tf "github.com/staticaland/brandish/pipelines/terraform"
+	vale "github.com/staticaland/brandish/pipelines/vale"
 )
 
 func main() {
@@ -28,4 +29,10 @@ func main() {
 		),
 	)
 	fmt.Println(tf.Fmt(client))
+
+	fmt.Println(vale.Vale(
+		client,
+		vale.WithHostDir("workdirs/vale")),
+	)
+
 }
