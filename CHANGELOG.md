@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/staticaland/brandish/compare/v1.1.0...v1.2.0) (2023-09-30)
+
+
+### Features
+
+* Add Vale pipeline ([b04584e](https://github.com/staticaland/brandish/commit/b04584ee6972614c2233350ee090c9efc1d02d74))
+
 ## [1.1.0](https://github.com/staticaland/brandish/compare/v1.0.0...v1.1.0) (2023-09-28)
 
 
