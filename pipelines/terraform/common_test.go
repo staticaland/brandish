@@ -43,5 +43,3 @@ func TestNew(t *testing.T) {
 		t.Errorf("Expected client to be equal, got different client")
 	}
 }
-
-// Continue writing tests for other functions...
