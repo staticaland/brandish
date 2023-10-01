@@ -9,19 +9,19 @@ import (
 func (tf *Terraform) WithExecuteFmt(opts ...TerraformOptions) (*dagger.Container, error) {
 	// Apply options
 	for _, opt := range opts {
-		opt(tf.config)
+		opt(tf)
 	}
 
 	args := []string{
 		"fmt",
 	}
 
-	if tf.config.Recursive {
+	if tf.fmtConfig.Recursive {
 		args = append(args, "-recursive")
 	}
 
-	if tf.config.Path != "." {
-		args = append(args, tf.config.Path)
+	if tf.commonConfig.Path != "." {
+		args = append(args, tf.commonConfig.Path)
 	}
 
 	tf = tf.WithTerraformFiles()

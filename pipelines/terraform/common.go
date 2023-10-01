@@ -8,38 +8,55 @@ import (
 	"dagger.io/dagger"
 )
 
-type TerraformOptions func(*TerraformConfig)
+type CommonConfig struct {
+	Path string
+}
 
-type TerraformConfig struct {
-	Path      string
+type FmtConfig struct {
 	Recursive bool
 }
 
-func WithPath(path string) TerraformOptions {
-	return func(cfg *TerraformConfig) {
-		cfg.Path = path
-	}
+type PlanConfig struct {
+	// Add any specific configuration for the Plan command here
 }
 
-func WithRecursive(recursive bool) TerraformOptions {
-	return func(cfg *TerraformConfig) {
-		cfg.Recursive = recursive
-	}
-}
+type TerraformOptions func(*Terraform)
 
 type Terraform struct {
-	ctx       context.Context
-	client    *dagger.Client
-	container *dagger.Container
-	config    *TerraformConfig
+	ctx          context.Context
+	client       *dagger.Client
+	container    *dagger.Container
+	commonConfig *CommonConfig
+	fmtConfig    *FmtConfig
+	planConfig   *PlanConfig
 }
 
-func New(ctx context.Context, client *dagger.Client) *Terraform {
+func WithCommonPath(path string) TerraformOptions {
+	return func(tf *Terraform) {
+		tf.commonConfig.Path = path
+	}
+}
+
+func WithFmtRecursive(recursive bool) TerraformOptions {
+	return func(tf *Terraform) {
+		tf.fmtConfig.Recursive = recursive
+	}
+}
+
+func New(ctx context.Context, client *dagger.Client, opts ...TerraformOptions) *Terraform {
 	tf := &Terraform{ctx: ctx, client: client}
 	tf.container = tf.NewContainer()
-	tf.config = &TerraformConfig{
-		Path:      ".",
+	tf.commonConfig = &CommonConfig{
+		Path: ".",
+	}
+	tf.fmtConfig = &FmtConfig{
 		Recursive: true,
+	}
+	tf.planConfig = &PlanConfig{
+		// Initialize any PlanConfig fields here
+	}
+	for _, opt := range opts {
+		opt(tf)
 	}
 	return tf
 }
@@ -60,7 +77,7 @@ func (tf *Terraform) WithTerraformFiles() *Terraform {
 
 	tf.container = tf.container.
 		WithDirectory("/workdir", terraformFiles).
-		WithWorkdir("/workdir")
+		WithWorkdir("/workdir") // TODO: Perhaps this should use commonConfig.Path
 
 	return tf
 }
