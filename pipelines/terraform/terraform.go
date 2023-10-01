@@ -8,6 +8,25 @@ import (
 	"dagger.io/dagger"
 )
 
+type TerraformOptions func(*TerraformConfig)
+
+type TerraformConfig struct {
+	Path      string
+	Recursive bool
+}
+
+func WithPath(path string) TerraformOptions {
+	return func(cfg *TerraformConfig) {
+		cfg.Path = path
+	}
+}
+
+func WithRecursive(recursive bool) TerraformOptions {
+	return func(cfg *TerraformConfig) {
+		cfg.Recursive = recursive
+	}
+}
+
 type Terraform struct {
 	ctx       context.Context
 	client    *dagger.Client
@@ -32,25 +51,6 @@ func (tf *Terraform) NewContainer() *dagger.Container {
 		Pipeline("terraform")
 }
 
-type TerraformOptions func(*TerraformConfig)
-
-type TerraformConfig struct {
-	Path      string
-	Recursive bool
-}
-
-func WithPath(path string) TerraformOptions {
-	return func(cfg *TerraformConfig) {
-		cfg.Path = path
-	}
-}
-
-func WithRecursive(recursive bool) TerraformOptions {
-	return func(cfg *TerraformConfig) {
-		cfg.Recursive = recursive
-	}
-}
-
 func (tf *Terraform) WithTerraformFiles() *Terraform {
 	terraformFiles := tf.client.Host().Directory(".", dagger.HostDirectoryOpts{
 		Include: []string{
@@ -65,7 +65,7 @@ func (tf *Terraform) WithTerraformFiles() *Terraform {
 	return tf
 }
 
-func (tf *Terraform) Fmt(opts ...TerraformOptions) string {
+func (tf *Terraform) WithExecuteFmt(opts ...TerraformOptions) (*dagger.Container, error) {
 	// Apply options
 	for _, opt := range opts {
 		opt(tf.config)
@@ -90,53 +90,74 @@ func (tf *Terraform) Fmt(opts ...TerraformOptions) string {
 		WithExec(args).
 		Sync(tf.ctx)
 
+	return container, err
+}
+
+func (tf *Terraform) Fmt(opts ...TerraformOptions) string {
+	container, err := tf.WithExecuteFmt(opts...)
 	if err != nil {
 		// Unexpected error, could be network failure.
 		fmt.Println(err)
+		return ""
 	}
 
 	out, err := container.Stdout(tf.ctx)
 	if err != nil {
 		fmt.Println(err)
+		return ""
 	}
 
 	// Export the changes back to the host
 	_, err = container.Directory(".").Export(tf.ctx, ".")
 	if err != nil {
 		fmt.Println(err)
+		return ""
 	}
 
 	return out
 }
 
-func (tf *Terraform) Plan() string {
+func (tf *Terraform) WithAWSAuth() *Terraform {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println(err)
+		return tf
+	}
+
+	tf.container = tf.container.
+		WithEnvVariable("AWS_PROFILE", os.Getenv("AWS_PROFILE")).
+		WithDirectory("/root/.aws", tf.client.Host().Directory(fmt.Sprintf("%s/.aws", homeDir)))
+
+	return tf
+}
+
+func (tf *Terraform) WithExecutePlan() (*dagger.Container, error) {
 	args := []string{
 		"plan",
 	}
 
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		fmt.Println(err)
-		return ""
-	}
-
-	tf = tf.WithTerraformFiles()
-
 	container, err := tf.container.
 		Pipeline("plan").
-		WithEnvVariable("AWS_PROFILE", os.Getenv("AWS_PROFILE")).
-		WithDirectory("/root/.aws", tf.client.Host().Directory(fmt.Sprintf("%s/.aws", homeDir))).
 		WithExec(args).
 		Sync(tf.ctx)
 
+	return container, err
+}
+
+func (tf *Terraform) Plan() string {
+	tf = tf.WithTerraformFiles().WithAWSAuth()
+
+	container, err := tf.WithExecutePlan()
 	if err != nil {
 		// Unexpected error, could be network failure.
 		fmt.Println(err)
+		return ""
 	}
 
 	out, err := container.Stdout(tf.ctx)
 	if err != nil {
 		fmt.Println(err)
+		return ""
 	}
 
 	return out
