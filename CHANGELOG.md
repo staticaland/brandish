@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.4.0](https://github.com/staticaland/brandish/compare/v1.3.0...v1.4.0) (2023-10-01)
+
+
+### Features
+
+* Making pipeline more composable ([b5280a2](https://github.com/staticaland/brandish/commit/b5280a29156c77aea599f39faf4b692a54dba5fb))
+* More flexible config system ([665f302](https://github.com/staticaland/brandish/commit/665f3029660b582496a8dadced1e22779e5e3fa8))
+* Split Terraform pipeline into multiple files ([caeee87](https://github.com/staticaland/brandish/commit/caeee878de43d4b931584a9b4a678cf9061b3fb7))
+* Terraform pipeline using methods ([a55b467](https://github.com/staticaland/brandish/commit/a55b4679c26245794a1096e46e53306e95570039))
+
 ## [1.3.0](https://github.com/staticaland/brandish/compare/v1.2.0...v1.3.0) (2023-09-30)
 
 
