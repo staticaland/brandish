@@ -7,7 +7,7 @@ import (
 
 	d "dagger.io/dagger"
 	md "github.com/staticaland/brandish/pipelines/markdownlint"
-	tf "github.com/staticaland/brandish/pipelines/terraform"
+	terraform "github.com/staticaland/brandish/pipelines/terraform"
 	vale "github.com/staticaland/brandish/pipelines/vale"
 )
 
@@ -28,8 +28,10 @@ func main() {
 			md.WithFix(),
 		),
 	)
-	fmt.Println(tf.Fmt(client))
-	fmt.Println(tf.Plan(client))
+	tf := terraform.New(ctx, client)
+
+	fmt.Println(tf.Fmt())
+	fmt.Println(tf.Plan())
 
 	fmt.Println(vale.Vale(
 		client,
