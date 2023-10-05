@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"dagger.io/dagger"
 )
@@ -69,6 +70,9 @@ func (tf *Terraform) NewContainer() *dagger.Container {
 }
 
 func (tf *Terraform) WithTerraformFiles() *Terraform {
+
+	workdir := filepath.Join("/workdir", tf.commonConfig.Path)
+
 	terraformFiles := tf.client.Host().Directory(".", dagger.HostDirectoryOpts{
 		Include: []string{
 			"**/*.tf",
@@ -77,7 +81,7 @@ func (tf *Terraform) WithTerraformFiles() *Terraform {
 
 	tf.container = tf.container.
 		WithDirectory("/workdir", terraformFiles).
-		WithWorkdir("/workdir") // TODO: Perhaps this should use commonConfig.Path
+		WithWorkdir(workdir)
 
 	return tf
 }
