@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/staticaland/brandish/compare/v1.4.0...v1.5.0) (2023-10-05)
+
+
+### Features
+
+* Use common path when running Terraform ([4f76b1c](https://github.com/staticaland/brandish/commit/4f76b1c58ab8c002b252c9a0a9c242c5bb8c4d88))
+
 ## [1.4.0](https://github.com/staticaland/brandish/compare/v1.3.0...v1.4.0) (2023-10-01)
 
 
