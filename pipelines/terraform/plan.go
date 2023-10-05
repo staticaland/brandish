@@ -1,12 +1,30 @@
 package terraform
 
 import (
-	"fmt"
-
 	"dagger.io/dagger"
 )
 
-func (tf *Terraform) WithExecutePlan() (*dagger.Container, error) {
+// TODO: I like having a output struct, but how do I handle errors and exit codes?
+// There is something about https://pkg.go.dev/dagger.io/dagger#ExecError
+
+type PlanOutputs struct {
+	Stdout   string
+	Stderr   string
+	ExitCode int
+}
+
+func (tf *Terraform) WithExecInit() *Terraform {
+	args := []string{
+		"init",
+	}
+
+	tf.container = tf.container.
+		WithExec(args)
+
+	return tf
+}
+
+func (tf *Terraform) WithExecPlan() (*dagger.Container, error) {
 	args := []string{
 		"plan",
 	}
@@ -19,21 +37,29 @@ func (tf *Terraform) WithExecutePlan() (*dagger.Container, error) {
 	return container, err
 }
 
-func (tf *Terraform) Plan() string {
-	tf = tf.WithTerraformFiles().WithAWSAuth()
+func (tf *Terraform) Plan() (PlanOutputs, error) {
+	tf = tf.WithTerraformFiles().WithAWSAuth().WithExecInit()
 
-	container, err := tf.WithExecutePlan()
+	container, err := tf.WithExecPlan()
 	if err != nil {
 		// Unexpected error, could be network failure.
-		fmt.Println(err)
-		return ""
+		return PlanOutputs{}, err
 	}
 
 	out, err := container.Stdout(tf.ctx)
 	if err != nil {
-		fmt.Println(err)
-		return ""
+		return PlanOutputs{}, err
 	}
 
-	return out
+	errOut, err := container.Stderr(tf.ctx)
+	if err != nil {
+		return PlanOutputs{}, err
+	}
+
+	return PlanOutputs{
+		Stdout:   out,
+		Stderr:   errOut,
+		ExitCode: 0, // TODO: Replace with the actual exit code
+	}, nil
+
 }
