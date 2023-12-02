@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/staticaland/brandish/compare/v1.5.0...v1.6.0) (2023-12-02)
+
+
+### Features
+
+* Playing around with returns ([c96bbd8](https://github.com/staticaland/brandish/commit/c96bbd89ca8459d4331f7319d3f3e358084aa267))
+
 ## [1.5.0](https://github.com/staticaland/brandish/compare/v1.4.0...v1.5.0) (2023-10-05)
 
 
